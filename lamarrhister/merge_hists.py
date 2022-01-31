@@ -56,7 +56,6 @@ def merge_hists():
                         raise ValueError(f"Inconsistent histograms {key}")
                     merged_dict['effplots'][key][cut] = (np.array(h1) + np.array(h2), bx1)
 
-    print(merged_dict['effplots'])
     return 0
 
 if __name__ == '__main__':
