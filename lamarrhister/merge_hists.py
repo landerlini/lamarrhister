@@ -15,11 +15,8 @@ def merge_hists():
                         help="Output file name (Pickle format)")
 
     args = parser.parse_args()
-
     merged_dict = None
-
     files = sum([glob(f) for f in args.files], [])
-    print (files)
 
     for file in files:
         with open(file, 'rb') as f_input:
