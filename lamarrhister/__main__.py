@@ -102,8 +102,9 @@ def main():
             for cut in effplot['cuts']:
                 sel_df = hist_df.query(cut.format(**var_code))
                 var = sel_df.eval(var_code[effplot['var']]).values
+                weight = sel_df.eval(var_code['weight']) if histogram['weight'] else None
 
-            data['full'] = np.histogram(var, bins=binning, weights=weight)
+                data[cut] = np.histogram(var, bins=binning, weights=weight)
 
     with open(args.output_filename, 'wb') as f_output:
         pickle.dump(output_dict, f_output)
