@@ -89,12 +89,12 @@ def main():
             data = dict()
             output_dict['effplots'][effplot['name']] = data
 
-            weight = hist_df.eval(var_code['weight']) if histogram['weight'] else None
             if 'selection' in effplot.keys():
                 hist_df = df.query(effplot['selection'].format(**var_code))
             else:
                 hist_df = df
 
+            weight = hist_df.eval(var_code['weight']) if histogram['weight'] else None
             var = hist_df.eval(var_code[effplot['var']]).values
             low, high, nBins = vardb.loc[effplot['var'], ['Min', 'Max', 'nBins']]
             binning = np.linspace(low, high, nBins + 1)
