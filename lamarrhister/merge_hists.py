@@ -31,18 +31,18 @@ def merge_hists():
                 if len(merged_hist) == 2:
                     h1, bx1 = merged_hist
                     h2, bx2 = new_hist
-                    if any(bx1 != bx2):
+                    if np.any(bx1 != bx2):
                         raise ValueError("Inconsistent histograms")
                     hists.append((np.array(h1) + np.array(h2), bx1))
 
                 # 2D histograms
-                elif len(merged_hist) == 2:
+                elif len(merged_hist) == 3:
                     h1, bx1, by1 = merged_hist
                     h2, bx2, by2 = new_hist
 
-                    if any(bx1 != bx2) or any(by1 != by2):
+                    if np.any(bx1 != bx2) or np.any(by1 != by2):
                         raise ValueError("Inconsistent histograms")
-                    hists.append((np.array(h1) + np.array(h2), bx1, bx2))
+                    hists.append((np.array(h1) + np.array(h2), bx1, by1))
 
             merged_dict['hists'] = hists
 
