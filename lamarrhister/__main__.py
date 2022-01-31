@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import uproot
 
-def main ():
+
+def main():
     parser = ArgumentParser(description="Simple python package to fill histograms")
     parser.add_argument("--histdb", '-H', type=str,
                         help="JSON file listing histograms")
