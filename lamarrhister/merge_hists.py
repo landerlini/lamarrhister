@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from glob import glob
 import pickle
 import numpy as np
 
@@ -17,7 +18,10 @@ def merge_hists():
 
     merged_dict = None
 
-    for file in args.files:
+    files = sum([glob(f) for f in args.files], [])
+    print (files)
+
+    for file in files:
         with open(file, 'rb') as f_input:
             hist_data = pickle.load(f_input)
 
