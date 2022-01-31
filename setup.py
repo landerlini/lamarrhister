@@ -5,7 +5,7 @@ from glob import glob
 with open ("README.md", "r") as readme:
     long_description = readme.read()
 
-setup (
+setup(
     name='lamarrhister',
     version='0.1',
     description='Helper package to fill histograms in Dirac jobs',
@@ -15,7 +15,7 @@ setup (
     author_email='Lucio.Anderlini@fi.infn.it',
     url='https://github.com/landerlini/lamarrhist',
     packages=setuptools.find_packages(),
-    classifiers = [
+    classifiers=[
         "Programmin Language :: Python :: 3"
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
@@ -27,7 +27,7 @@ setup (
     ],
     entry_points={  # Optional
         'console_scripts': [
-            'fill-hist=lamarrhist.__main__:main',
+            'fill-hist=lamarrhister.__main__:main',
         ],
     },
 )
