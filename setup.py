@@ -28,6 +28,7 @@ setup(
     entry_points={  # Optional
         'console_scripts': [
             'fill-hist=lamarrhister.__main__:main',
+            'merge-hist=lamarrhister.merge_hists:merge_hists',
         ],
     },
 )
