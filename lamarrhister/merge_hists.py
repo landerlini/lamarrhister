@@ -57,6 +57,9 @@ def merge_hists():
                         raise ValueError(f"Inconsistent histograms {key}")
                     merged_dict['effplots'][key][cut] = (np.array(h1) + np.array(h2), bx1)
 
+    with open(args.output_filename, "wb") as file_out:
+        pickle.dump(merged_dict, file_out)
+
     return 0
 
 if __name__ == '__main__':
