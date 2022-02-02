@@ -108,7 +108,8 @@ def main():
 
         for effplot in histdb['effplots']:
             data = dict()
-            output_dict['effplots'][effplot['name']] = data
+            slot_name = f"{effplot['name']}_{effplot['var']}"
+            output_dict['effplots'][slot_name] = data
 
             if 'selection' in effplot.keys():
                 hist_df = df.query(effplot['selection'].format(**var_code))
