@@ -27,6 +27,10 @@ def efficiency(n, k):
         * (lower confidence bound, mean efficiency, higher confidence bound)
     """
     eff = np.linspace(0, 1, 1000)
+    if k > 100 and n - k > 100:
+        err = np.sqrt(max(0, k*(n-k)/(n**3)))
+        return k/n - err, k/n, k/n + err
+
     p = binom(n, k) * (eff ** k) * (1 - eff) ** (n - k)
     cumulative_p = np.cumsum(p)
     cumulative_p /= cumulative_p[-1]
@@ -179,24 +183,26 @@ def make_report():
                 plt.close()
 
     report.add_markdown("### Efficiency plots")
-    pprint(histdb['effplots'])
+    #pprint(histdb['effplots'])
 
 
     for effplot in histdb['effplots']:
-        ref = reference['effplots'][effplot['name']]
-        lam = lamarr['effplots'][effplot['name']]
+        slot_name = f"{effplot['name']}_{effplot['var']}"
+        ref = reference['effplots'][slot_name]
+        lam = lamarr['effplots'][slot_name]
 
         report.add_markdown(
             f' * {effplot["name"]}' +
-            f"   [{', '.join([r for r in lam.keys() if r != 'full'])}]"
+            f"   [{', '.join([r for r in lam.keys() if r != 'full'])}]" +
+            f"   `slot: {slot_name}`"
             )
 
-        ref_deno, boundaries = ref['full']
-        lam_deno, _ = lam['full']
+        ref_deno, _ = ref['full']
+        lam_deno, boundaries = lam['full']
 
         for cut in [k for k in lam.keys() if k != 'full']:
             ref_nume, _ = ref[cut]
-            lam_nume, _ = ref[cut]
+            lam_nume, _ = lam[cut]
             x = (boundaries[1:] + boundaries[:-1])/2
             mskr = (ref_deno > 0)
             mskl = (lam_deno > 0)
@@ -208,9 +214,12 @@ def make_report():
                 [efficiency(n, k) for n, k in np.c_[lam_deno[mskl], lam_nume[mskl]]]
             )
 
+
+            if ref_eff.size == 0 or lam_eff.size == 0: continue
+
             plt.figure(figsize=(5, 3.5), dpi=130)
             ref_y = 0.5*(ref_eff[:, 0] + ref_eff[:, 2])
-            ref_yerr = [ref_y - ref_eff[:, 0], ref_eff[:, 2] - ref_y]
+            ref_yerr = np.abs([ref_y - ref_eff[:, 0], ref_eff[:, 2] - ref_y])
             plt.errorbar(x[mskr], ref_y, ref_yerr, xerr[mskr],
                          fmt='o', color='#6be', markersize=0, linewidth=7, alpha=1,
                          label='Reference'
