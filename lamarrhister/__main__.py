@@ -7,6 +7,16 @@ import pandas as pd
 import uproot
 
 
+def parse_cut(cut):
+    cuts = cut.replace('||', '|').split('|')
+    cut = ' | '.join([f'({c})' for c in cuts])
+
+    cuts = cut.replace('&&', '&').split('&')
+    cut = ' & '.join([f'({c})' for c in cuts])
+
+    return cut
+
+
 def main():
     parser = ArgumentParser(description="Simple python package to fill histograms")
     parser.add_argument("--histdb", '-H', type=str,
@@ -51,7 +61,12 @@ def main():
             raise ValueError(f"Multiple trees in {file_name}: {trees}.\n" +
                              "Specify one with --tree")
 
-        df = uproot.open(file_name)[tree_name].arrays(library='pd', cut=selection)
+        parsed_selection = [parse_cut(cut) for cut in selection]
+        selection_string = " & ".join([f"({cut})" for cut in parsed_selection])
+
+        print (selection_string)
+
+        df = uproot.open(file_name)[tree_name].arrays(library='pd', cut=selection_string)
 
         for histogram in histdb['hists']:
             if 'selection' in histogram and histogram['selection'] != '':
