@@ -59,7 +59,7 @@ def draw_histogram (boundaries, contentsL, contentsR, title):
         return False
 
     contentsR = contentsR * np.sum(contentsL) / np.sum(contentsR)
-    plt.figure(figsize=(5, 3.5), dpi=100)
+    plt.figure(figsize=(5, 3.5), dpi=130)
     x = (boundaries[1:] + boundaries[:-1]) / 2
     dx = (boundaries[1:] - boundaries[:-1]) / 2
     plt.hist(x, bins=boundaries, weights=contentsR, alpha=0.2, color='#08c')
@@ -153,7 +153,7 @@ def make_report():
                         report.add_figure()
                         plt.close()
             else: # 2D scatter plots
-                plt.figure(figsize=(5, 3.5), dpi=100)
+                plt.figure(figsize=(5, 3.5), dpi=130)
                 x = (boundariesX[1:] + boundariesX[:-1])/2
                 y = (boundariesY[1:] + boundariesY[:-1])/2
                 x, y = np.meshgrid(x, y)
@@ -208,7 +208,7 @@ def make_report():
                 [efficiency(n, k) for n, k in np.c_[lam_deno[mskl], lam_nume[mskl]]]
             )
 
-            plt.figure(figsize=(5, 3.5), dpi=100)
+            plt.figure(figsize=(5, 3.5), dpi=130)
             ref_y = 0.5*(ref_eff[:, 0] + ref_eff[:, 2])
             ref_yerr = [ref_y - ref_eff[:, 0], ref_eff[:, 2] - ref_y]
             plt.errorbar(x[mskr], ref_y, ref_yerr, xerr[mskr],
