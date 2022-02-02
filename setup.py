@@ -25,10 +25,18 @@ setup(
         "pandas>=1.3",
         "uproot>=4.0"
     ],
+    extras_require={
+        'reports': [
+            'html-reports>=0.2',
+            'matplotlib>=3.2',
+            'scipy>=1.0',
+        ]
+    },
     entry_points={  # Optional
         'console_scripts': [
             'fill-hist=lamarrhister.__main__:main',
             'merge-hist=lamarrhister.merge_hists:merge_hists',
+            'make-report=lamarrhister.make_report:make_report',
         ],
     },
 )
