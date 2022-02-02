@@ -120,7 +120,6 @@ def make_report():
     for hist_desc, histR, histL in zip(histdb['hists'], reference['hists'], lamarr['hists']):
         report.add_markdown(f'#### {" #perp ".join(var_title[v] for v in hist_desc["vars"])}')
         if len(hist_desc['vars']) == 1:  ## 1D histogram
-          if False:
             contentsL, boundaries = histL
             contentsR, _ = histR
             draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'))
@@ -131,7 +130,6 @@ def make_report():
             contentsL, boundariesX, boundariesY = histL
             contentsR, _, _ = histR
             if len(boundariesY) < 20:
-              if False:
                 for iRow, (low, high) in enumerate(zip(boundariesY[:-1], boundariesY[1:])):
                     if draw_histogram(boundariesX, contentsL[:,iRow], contentsR[:,iRow],
                                    title=greeks(histdb['title'], 'latex')):
@@ -163,7 +161,7 @@ def make_report():
                 contentsR *= 50 / np.max(contentsR)
                 contentsL *= 50 / np.max(contentsL)
                 plt.scatter(x.flatten(), y.flatten(), s=contentsR.T.flatten(), alpha=0.5, c='#08c', marker='s', label='Reference')
-                plt.scatter(x.flatten(), y.flatten(), s=contentsL.T.flatten(), alpha=0.5, c='#c08', marker='s', label='GAN Simulation')
+                plt.scatter(x.flatten(), y.flatten(), s=contentsL.T.flatten(), alpha=0.3, c='#c08', marker='s', label='GAN Simulation')
 
                 plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'))
                 plt.ylabel(greeks(var_title[hist_desc['vars'][1]], 'latex'))
@@ -185,7 +183,6 @@ def make_report():
 
 
     for effplot in histdb['effplots']:
-      if False:
         ref = reference['effplots'][effplot['name']]
         lam = lamarr['effplots'][effplot['name']]
 
