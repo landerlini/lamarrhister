@@ -202,10 +202,10 @@ def make_report():
             mskl = (lam_deno > 0)
             xerr = (boundaries[1:] - boundaries[:-1])/2
             ref_eff = np.array(
-                [efficiency(n, k) for n, k in np.c_[ref_deno[mskr], ref_nume[mskl]]]
+                [efficiency(n, k) for n, k in np.c_[ref_deno[mskr], ref_nume[mskr]]]
             )
             lam_eff = np.array(
-                [efficiency(n, k) for n, k in np.c_[lam_deno[mskr], lam_nume[mskl]]]
+                [efficiency(n, k) for n, k in np.c_[lam_deno[mskl], lam_nume[mskl]]]
             )
 
             plt.figure(figsize=(5, 3.5), dpi=100)
