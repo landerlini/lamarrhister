@@ -71,7 +71,8 @@ def main():
 
         print (selection_string)
 
-        df = uproot.open(file_name)[tree_name].arrays(library='pd', cut=selection_string)
+        df = uproot.open(file_name)[tree_name].arrays(library='np', cut=selection_string)
+        df = pd.DataFrame(df)
 
         for histogram in histdb['hists']:
             if 'selection' in histogram and histogram['selection'] != '':
@@ -114,7 +115,7 @@ def main():
             else:
                 hist_df = df
 
-            weight = hist_df.eval(var_code['weight']) if histogram['weight'] else None
+            weight = hist_df.eval(var_code['weight']) if effplot['weight'] else None
             var = hist_df.eval(var_code[effplot['var']]).values
             low, high, nBins = vardb.loc[effplot['var'], ['Min', 'Max', 'nBins']]
             binning = np.linspace(low, high, nBins + 1)
@@ -122,7 +123,7 @@ def main():
             for cut in effplot['cuts']:
                 sel_df = hist_df.query(cut.format(**var_code))
                 var = sel_df.eval(var_code[effplot['var']]).values
-                weight = sel_df.eval(var_code['weight']) if histogram['weight'] else None
+                weight = sel_df.eval(var_code['weight']) if effplot['weight'] else None
 
                 data[cut] = np.histogram(var, bins=binning, weights=weight)
 
