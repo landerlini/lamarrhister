@@ -72,7 +72,7 @@ def main():
         print (selection_string)
 
         df = uproot.open(file_name)[tree_name].arrays(library='np', cut=selection_string)
-        df = pd.DataFrame(df)
+        df = pd.DataFrame({k: v for k, v in df.items() if len(v.shape) == 1})
 
         for histogram in histdb['hists']:
             if 'selection' in histogram and histogram['selection'] != '':
