@@ -8,11 +8,16 @@ import uproot
 
 
 def parse_cut(cut):
-    cuts = cut.replace('||', '|').split('|')
-    cut = ' | '.join([f'({c})' for c in cuts])
+    if '|' in cut:
+        cuts = cut.replace('||', '|').split('|')
+        cut = ' | '.join([f'({c})' for c in cuts])
 
-    cuts = cut.replace('&&', '&').split('&')
-    cut = ' & '.join([f'({c})' for c in cuts])
+    if '&' in cut:
+        cuts = cut.replace('&&', '&').split('&')
+        cut = ' & '.join([f'({c})' for c in cuts])
+
+    if cut[0] != '(' or cut[-1] != ')':
+        cut = f"({cut})"
 
     return cut
 
@@ -62,7 +67,7 @@ def main():
                              "Specify one with --tree")
 
         parsed_selection = [parse_cut(cut) for cut in selection]
-        selection_string = " & ".join([f"({cut})" for cut in parsed_selection])
+        selection_string = " & ".join(parsed_selection)
 
         print (selection_string)
 
