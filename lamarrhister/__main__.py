@@ -67,7 +67,7 @@ def main():
                              "Specify one with --tree")
 
         parsed_selection = [parse_cut(cut) for cut in selection]
-        selection_string = " & ".join(parsed_selection)
+        selection_string = " & ".join(parsed_selection) if len(parsed_selection) else None
 
         all_branches = list(root_file[tree_name].keys())
         branches = [b for b in all_branches if b in "".join([s for s in var_code.values() if s is not None])]
