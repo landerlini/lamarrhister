@@ -69,9 +69,10 @@ def main():
         parsed_selection = [parse_cut(cut) for cut in selection]
         selection_string = " & ".join(parsed_selection)
 
-        print (selection_string)
+        all_branches = list(root_file[tree_name].keys())
+        branches = [b for b in all_branches if b in "".join([s for s in var_code.values() if s is not None])]
 
-        df = uproot.open(file_name)[tree_name].arrays(library='np', cut=selection_string)
+        df = root_file[tree_name].arrays(branches, library='np', cut=selection_string)
         df = pd.DataFrame({k: v for k, v in df.items() if len(v.shape) == 1})
 
         for histogram in histdb['hists']:
