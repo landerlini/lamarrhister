@@ -54,7 +54,7 @@ def greeks(string, fmt):
     elif fmt.lower() == 'latex':
         string = re.sub("#([A-Za-z]*)([^A-Z-a-z])", r"\\\1\2", string)
         string = re.sub("#([A-Za-z]*)$", r"\\\1", string)
-        string = " ".join([f"${a}$" if '_' in a or '\\' in a or '?' in a else a for a in string.split(' ')])
+        string = " ".join([f"${a}$" if '_' in a or '\\' in a or '?' in a or '^' in a else a for a in string.split(' ')])
 
     return string
 
