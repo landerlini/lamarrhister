@@ -21,7 +21,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "numpy==1.22",
+        "numpy>=1.20",
         "pandas>=1.3",
         "uproot>=4.0"
     ],
