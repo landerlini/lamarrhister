@@ -131,7 +131,7 @@ def main():
 
     with open(args.output_filename, 'wb') as f_output:
         pickle.dump(output_dict, f_output)
-    print(f"Output file {args.output_filename} was stored on disk")
+    print(f"Output file {args.output_filename}, containing {len(hist_df)} events, was stored on disk")
 
     return 0
 
