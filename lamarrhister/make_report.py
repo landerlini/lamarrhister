@@ -15,6 +15,8 @@ import pandas as pd
 from html_reports import Report
 
 
+GAN_COLOR = None
+
 def efficiency(n, k):
     """
     Efficiency confidence interval given n and k
@@ -58,7 +60,7 @@ def greeks(string, fmt):
 
     return string
 
-def draw_histogram (boundaries, contentsL, contentsR, title):
+def draw_histogram (boundaries, contentsL, contentsR, title, gan_label):
     if np.sum(contentsR) == 0 or np.sum(contentsL) == 0:
         return False
 
@@ -74,8 +76,8 @@ def draw_histogram (boundaries, contentsL, contentsR, title):
     plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.15)
     msk = (contentsL > 0)
     plt.errorbar(x[msk], contentsL[msk], np.sqrt(contentsL[msk]), dx[msk],
-                 fmt='o', color='#c08', markersize=3,
-                 label='GAN Simulation')
+                 fmt='o', color=GAN_COLOR, markersize=3,
+                 label=gan_label)
     plt.legend(title=title, ncol=2, bbox_to_anchor=(0.67, 1.27),
                title_fontsize='large', loc='upper center', framealpha=1, shadow=True)
 
@@ -97,8 +99,14 @@ def make_report():
                         help="Pickle file with merged reference (TurCal or Detailed Sim) histograms")
     parser.add_argument("--output-filename", '-o', type=str, default="report.html",
                         help="Output report file name (HTML format)")
+    parser.add_argument("--gan-label", type=str, default="GAN Simulation",
+                        help="Label of the Lamarr histogram")
+    parser.add_argument("--gan-color", type=str, default="#c08",
+                        help="Label of the Lamarr histogram")
 
     args = parser.parse_args()
+    global GAN_COLOR
+    GAN_COLOR = args.gan_color
 
     with open(args.histdb, 'rb') as file_in:
         histdb = json.load(file_in)
@@ -126,7 +134,7 @@ def make_report():
         if len(hist_desc['vars']) == 1:  ## 1D histogram
             contentsL, boundaries = histL
             contentsR, _ = histR
-            draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'))
+            draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label)
             plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'))
             report.add_figure()
             plt.close()
@@ -136,7 +144,8 @@ def make_report():
             if len(boundariesY) < 20:
                 for iRow, (low, high) in enumerate(zip(boundariesY[:-1], boundariesY[1:])):
                     if draw_histogram(boundariesX, contentsL[:,iRow], contentsR[:,iRow],
-                                   title=greeks(histdb['title'], 'latex')):
+                                   title=greeks(histdb['title'], 'latex'),
+                                   gan_label=args.gan_label):
                         plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'))
                         bin_string = greeks(var_title[hist_desc['vars'][1]], 'latex')
                         if 'MeV' in bin_string:
@@ -165,7 +174,7 @@ def make_report():
                 contentsR *= 50 / np.max(contentsR)
                 contentsL *= 50 / np.max(contentsL)
                 plt.scatter(x.flatten(), y.flatten(), s=contentsR.T.flatten(), alpha=0.5, c='#08c', marker='s', label='Reference')
-                plt.scatter(x.flatten(), y.flatten(), s=contentsL.T.flatten(), alpha=0.3, c='#c08', marker='s', label='GAN Simulation')
+                plt.scatter(x.flatten(), y.flatten(), s=contentsL.T.flatten(), alpha=0.3, c=GAN_COLOR, marker='s', label=args.gan_label)
 
                 plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'))
                 plt.ylabel(greeks(var_title[hist_desc['vars'][1]], 'latex'))
@@ -227,8 +236,8 @@ def make_report():
             lam_y = lam_eff[:, 1]
             lam_yerr = [lam_y - lam_eff[:, 0], lam_eff[:, 2] - lam_y]
             plt.errorbar(x[mskl], lam_y, lam_yerr, xerr[mskl],
-                         fmt='o', color='#c08', markersize=4,
-                         label='GAN Simulation')
+                         fmt='o', color=GAN_COLOR, markersize=4,
+                         label=args.gan_label)
 
         plt.ylim(-0.1, 1.1)
 
