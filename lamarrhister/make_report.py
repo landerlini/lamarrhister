@@ -135,7 +135,7 @@ def make_report():
 
     n_events_lamarr = np.max([np.sum(hist[0]) for hist, desc in zip(lamarr['hists'], histdb['hists']) if len(desc['vars'])==1])
     n_events_reference = np.max([np.sum(hist[0]) for hist, desc in zip(reference['hists'], histdb['hists']) if len(desc['vars'])==1])
-    report.add_markdown(f"Selected events in *{args.gan-label}* sample: {n_events_lamarr}")
+    report.add_markdown(f"Selected events in *{args.gan_label}* sample: {n_events_lamarr}")
     report.add_markdown(f"Selected events in *Reference* sample: {n_events_reference}")
 
     report.add_markdown("### Histograms")
