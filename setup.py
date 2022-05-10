@@ -22,6 +22,7 @@ setup(
     ],
     install_requires=[
         "numpy",
+        "mplhep",
         "pandas>=1.3",
         "uproot>=4.0"
     ],

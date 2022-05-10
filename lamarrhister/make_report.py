@@ -13,7 +13,10 @@ matplotlib.rcParams['font.family'] = 'serif'
 import matplotlib.pyplot as plt
 import pandas as pd
 from html_reports import Report
+import mplhep as hep
+import matplotlib as mpl
 
+hep.style.use(hep.style.LHCb2)
 
 GAN_COLOR = None
 
@@ -65,12 +68,12 @@ def draw_histogram (boundaries, contentsL, contentsR, title, gan_label):
         return False
 
     contentsR = contentsR * np.sum(contentsL) / np.sum(contentsR)
-    plt.figure(figsize=(5, 3.5), dpi=130)
+    #plt.figure(figsize=(7, 3.5), dpi=130)
     x = (boundaries[1:] + boundaries[:-1]) / 2
     dx = (boundaries[1:] - boundaries[:-1]) / 2
     plt.hist(x, bins=boundaries, weights=contentsR, alpha=0.2, color='#08c')
     plt.hist(x, bins=boundaries, weights=contentsR,
-             alpha=1, color='#08c', histtype='step', linewidth=2, label='Reference'
+             alpha=1, color='#08c', histtype='step', linewidth=4, label='Reference'
              )
 
     plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.15)
@@ -78,11 +81,13 @@ def draw_histogram (boundaries, contentsL, contentsR, title, gan_label):
     plt.errorbar(x[msk], contentsL[msk], np.sqrt(contentsL[msk]), dx[msk],
                  fmt='o', color=GAN_COLOR, markersize=3,
                  label=gan_label)
-    plt.legend(title=title, ncol=2, bbox_to_anchor=(0.67, 1.27),
-               title_fontsize='large', loc='upper center', framealpha=1, shadow=True)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+    plt.legend(title=title, ncol=2, bbox_to_anchor=(0.64, 1.27),
+               fontsize=22, title_fontsize=25, loc='upper center', framealpha=1, shadow=True)
 
-    plt.text(0.02, 1.05, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif', fontsize='large')
-    plt.ylabel('Normalized candidates')
+    plt.text(0.01, 1.04, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif', fontsize=28)
+    plt.ylabel('Normalized candidates', fontsize=28)
     return True
 
 
@@ -128,6 +133,11 @@ def make_report():
     for key, value in histdb['selection'].items():
         report.add_markdown(f'#### {key.capitalize()}\n * ' + "\n * ".join(histdb['selection'][key]))
 
+    n_events_lamarr = np.max([np.sum(hist[0]) for hist, desc in zip(lamarr['hists'], histdb['hists']) if len(desc['vars'])==1])
+    n_events_reference = np.max([np.sum(hist[0]) for hist, desc in zip(reference['hists'], histdb['hists']) if len(desc['vars'])==1])
+    report.add_markdown(f"Selected events in *Lamarr* sample: {n_events_lamarr}")
+    report.add_markdown(f"Selected events in *Reference* sample: {n_events_reference}")
+
     report.add_markdown("### Histograms")
     for hist_desc, histR, histL in zip(histdb['hists'], reference['hists'], lamarr['hists']):
         report.add_markdown(f'#### {" #perp ".join(var_title[v] for v in hist_desc["vars"])}')
@@ -135,9 +145,10 @@ def make_report():
             contentsL, boundaries = histL
             contentsR, _ = histR
             draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label)
-            plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'))
+            plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
             report.add_figure()
             plt.close()
+            report.write_report(filename=args.output_filename)
         elif len(hist_desc['vars']) == 2:  ## 2D histogram
             contentsL, boundariesX, boundariesY = histL
             contentsR, _, _ = histR
@@ -146,7 +157,7 @@ def make_report():
                     if draw_histogram(boundariesX, contentsL[:,iRow], contentsR[:,iRow],
                                    title=greeks(histdb['title'], 'latex'),
                                    gan_label=args.gan_label):
-                        plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'))
+                        plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
                         bin_string = greeks(var_title[hist_desc['vars'][1]], 'latex')
                         if 'MeV' in bin_string:
                             bin_string = f"{bin_string} in [{low:.0f}, {high:.0f}]"
@@ -162,11 +173,11 @@ def make_report():
                                  ha='right', va='top',
                                  transform=plt.gca().transAxes,
                                  fontfamily='serif',
-                                 fontsize='medium')
+                                 fontsize=18)
                         report.add_figure()
                         plt.close()
             else: # 2D scatter plots
-                plt.figure(figsize=(5, 3.5), dpi=130)
+                #plt.figure(figsize=(5, 3.5), dpi=130)
                 x = (boundariesX[1:] + boundariesX[:-1])/2
                 y = (boundariesY[1:] + boundariesY[:-1])/2
                 x, y = np.meshgrid(x, y)
@@ -176,17 +187,18 @@ def make_report():
                 plt.scatter(x.flatten(), y.flatten(), s=contentsR.T.flatten(), alpha=0.5, c='#08c', marker='s', label='Reference')
                 plt.scatter(x.flatten(), y.flatten(), s=contentsL.T.flatten(), alpha=0.3, c=GAN_COLOR, marker='s', label=args.gan_label)
 
-                plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'))
-                plt.ylabel(greeks(var_title[hist_desc['vars'][1]], 'latex'))
+                plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
+                plt.ylabel(greeks(var_title[hist_desc['vars'][1]], 'latex'), fontsize=28)
 
                 plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.15)
 
                 title = greeks(histdb['title'], 'latex')
-                plt.legend(title=title, ncol=2, bbox_to_anchor=(0.67, 1.27),
-                           title_fontsize='large', loc='upper center', framealpha=1, shadow=True)
+                plt.xticks(fontsize=24)
+                plt.yticks(fontsize=24)
+                plt.legend(title=title, ncol=2, bbox_to_anchor=(0.64, 1.27),
+                           fontsize=22, title_fontsize=25, loc='upper center', framealpha=1, shadow=True)
 
-                plt.text(0.02, 1.05, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif',
-                         fontsize='large')
+                plt.text(0.01, 1.04, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif', fontsize=28)
 
                 report.add_figure()
                 plt.close()
@@ -226,7 +238,7 @@ def make_report():
 
             if ref_eff.size == 0 or lam_eff.size == 0: continue
 
-            plt.figure(figsize=(5, 3.5), dpi=130)
+            #plt.figure(figsize=(5, 3.5), dpi=130)
             ref_y = 0.5*(ref_eff[:, 0] + ref_eff[:, 2])
             ref_yerr = np.abs([ref_y - ref_eff[:, 0], ref_eff[:, 2] - ref_y])
             plt.errorbar(x[mskr], ref_y, ref_yerr, xerr[mskr],
@@ -244,14 +256,15 @@ def make_report():
         plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.15)
 
         title = greeks(histdb['title'], 'latex')
-        plt.legend(title=title, ncol=2, bbox_to_anchor=(0.67, 1.27),
-                   title_fontsize='large', loc='upper center', framealpha=1, shadow=True)
+        plt.xticks(fontsize=24)
+        plt.yticks(fontsize=24)
+        plt.legend(title=title, ncol=2, bbox_to_anchor=(0.64, 1.27),
+                   fontsize=22, title_fontsize=25, loc='upper center', framealpha=1, shadow=True)
 
-        plt.text(0.02, 1.05, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif',
-                 fontsize='large')
+        plt.text(0.01, 1.04, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif', fontsize=28)
 
-        plt.xlabel(var_title[effplot['var']])
-        plt.ylabel("Selection efficiency")
+        plt.xlabel(var_title[effplot['var']], fontsize=28)
+        plt.ylabel("Selection efficiency", fontsize=28)
 
         report.add_figure()
         plt.close()
