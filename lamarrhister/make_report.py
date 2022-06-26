@@ -149,8 +149,9 @@ def make_report():
             contentsL, boundaries = histL
             contentsR, _ = histR
 
-            contentsL = contentsL[:-(len(contentsL) % args.rebin+1)]
-            contentsR = contentsR[:-(len(contentsR) % args.rebin+1)]
+            if len(contentsL) % args.rebin:
+                contentsL = contentsL[:-(len(contentsL) % args.rebin)]
+                contentsR = contentsR[:-(len(contentsR) % args.rebin)]
             contentsL = np.sum([np.asarray(contentsL)[i::args.rebin] for i in range(args.rebin)], axis=0)/args.rebin
             contentsR = np.sum([np.asarray(contentsR)[i::args.rebin] for i in range(args.rebin)], axis=0)/args.rebin
             boundaries = np.asarray(boundaries)[::args.rebin]
