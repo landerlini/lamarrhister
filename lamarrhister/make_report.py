@@ -207,10 +207,15 @@ def make_report():
                 title = greeks(histdb['title'], 'latex')
                 plt.xticks(fontsize=24)
                 plt.yticks(fontsize=24)
-                plt.legend(title=title, ncol=2, bbox_to_anchor=(0.64, 1.27),
+                plt.legend(title=None, ncol=1, bbox_to_anchor=(0.82, 1.27),
                            fontsize=22, title_fontsize=25, loc='upper center', framealpha=1, shadow=True)
 
-                plt.text(0.01, 1.04, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif', fontsize=28)
+                plt.text(0.55, 1.13, "LHCb Simulation Preliminary", transform=plt.gca().transAxes, fontfamily='serif',
+                         fontsize=28, ha='right', va='bottom')
+                plt.text(0.55, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif', fontsize=25, ha='right',
+                         va='bottom')
+                plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
+                         fontsize=23, rotation=90, va='bottom', ha='left')
 
                 report.add_figure()
                 plt.close()
@@ -270,10 +275,15 @@ def make_report():
         title = greeks(histdb['title'], 'latex')
         plt.xticks(fontsize=24)
         plt.yticks(fontsize=24)
-        plt.legend(title=title, ncol=2, bbox_to_anchor=(0.64, 1.27),
+        plt.legend(title=None, ncol=1, bbox_to_anchor=(0.82, 1.27),
                    fontsize=22, title_fontsize=25, loc='upper center', framealpha=1, shadow=True)
 
-        plt.text(0.01, 1.04, "LHCb\nSimulation", transform=plt.gca().transAxes, fontfamily='serif', fontsize=28)
+        plt.text(0.55, 1.13, "LHCb Simulation Preliminary", transform=plt.gca().transAxes, fontfamily='serif',
+                 fontsize=28, ha='right', va='bottom')
+        plt.text(0.55, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif', fontsize=25, ha='right',
+                 va='bottom')
+        plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
+                 fontsize=23, rotation=90, va='bottom', ha='left')
 
         plt.xlabel(var_title[effplot['var']], fontsize=28)
         plt.ylabel("Selection efficiency", fontsize=28)
