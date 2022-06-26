@@ -110,6 +110,8 @@ def make_report():
                         help="Label of the Lamarr histogram")
     parser.add_argument("--gan-color", type=str, default="#c08",
                         help="Label of the Lamarr histogram")
+    parser.add_argument("--rebin", type=int, default=1,
+                        help="Rebinning factor for 1D histograms")
 
     args = parser.parse_args()
     global GAN_COLOR
@@ -146,6 +148,11 @@ def make_report():
         if len(hist_desc['vars']) == 1:  ## 1D histogram
             contentsL, boundaries = histL
             contentsR, _ = histR
+
+            contentsL = np.sum([np.asarray(contentsL)[i::args.rebin] for i in range(args.rebin)], axis=0)/args.rebin
+            contentsR = np.sum([np.asarray(contentsR)[i::args.rebin] for i in range(args.rebin)], axis=0)/args.rebin
+            boundaries = np.asarray(boundaries)[::args.rebin]
+
             draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label)
             plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
             report.add_figure()
