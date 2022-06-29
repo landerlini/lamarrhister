@@ -19,6 +19,7 @@ import matplotlib as mpl
 hep.style.use(hep.style.LHCb2)
 
 GAN_COLOR = None
+FIG_COUNTER = 0
 
 def efficiency(n, k):
     """
@@ -96,6 +97,8 @@ def draw_histogram (boundaries, contentsL, contentsR, title, gan_label):
 
 
 def make_report():
+    global FIG_COUNTER
+
     parser = ArgumentParser(description="Produce an HTML Report comparing two series of histograms")
     parser.add_argument("--title", '-t', type=str, default="Validation", help="Report title")
     parser.add_argument("--histdb", '-H', type=str,
@@ -114,6 +117,8 @@ def make_report():
                         help="Label of the Lamarr histogram")
     parser.add_argument("--rebin", type=int, default=1,
                         help="Rebinning factor for 1D histograms")
+    parser.add_argument("--pdf", action='store_true',
+                        help="Creates and link pdf version of each figure")
 
     args = parser.parse_args()
     global GAN_COLOR
@@ -160,7 +165,8 @@ def make_report():
 
             draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label)
             plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
-            report.add_figure()
+            report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+            FIG_COUNTER += 1
             plt.close()
             report.write_report(filename=args.output_filename)
         elif len(hist_desc['vars']) == 2:  ## 2D histogram
@@ -188,7 +194,8 @@ def make_report():
                                  transform=plt.gca().transAxes,
                                  fontfamily='serif',
                                  fontsize=18)
-                        report.add_figure()
+                        report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+                        FIG_COUNTER += 1
                         plt.close()
             else: # 2D scatter plots
                 #plt.figure(figsize=(5, 3.5), dpi=130)
@@ -219,7 +226,8 @@ def make_report():
                 plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
                          fontsize=23, rotation=90, va='bottom', ha='left')
 
-                report.add_figure()
+                report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+                FIG_COUNTER += 1
                 plt.close()
 
     report.add_markdown("### Efficiency plots")
@@ -272,7 +280,6 @@ def make_report():
 
         plt.ylim(-0.1, 1.1)
 
-        plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.15)
 
         title = greeks(histdb['title'], 'latex')
         plt.xticks(fontsize=24)
@@ -287,10 +294,12 @@ def make_report():
         plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
                  fontsize=23, rotation=90, va='bottom', ha='left')
 
-        plt.xlabel(var_title[effplot['var']], fontsize=20)
-        plt.ylabel("Selection efficiency", fontsize=20)
+        plt.xlabel(greeks(var_title[effplot['var']], 'latex'), fontsize=25)
+        plt.ylabel("Selection efficiency", fontsize=25)
+        plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.20)
 
-        report.add_figure()
+        report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+        FIG_COUNTER += 1
         plt.close()
 
         #report.add_markdown(f"    {', '.join([r.format(**var_title) for r in ref.keys() if r != 'full'])}")
