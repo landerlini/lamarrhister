@@ -59,7 +59,9 @@ def greeks(string, fmt):
     elif fmt.lower() == 'latex':
         string = re.sub("#([A-Za-z]*)([^A-Z-a-z])", r"\\\1\2", string)
         string = re.sub("#([A-Za-z]*)$", r"\\\1", string)
-        string = " ".join([f"${a}$" if '_' in a or '\\' in a or '?' in a or '^' in a else a for a in string.split(' ')])
+        string = " ".join([f"${a}$" if '_' in a or '\\' in a or '?' in a or '^' in a else a
+                           for a in string.split(' ')])
+        string = re.sub("\$(.*)([GMk]eV)(.*)\$", r"$\1\\mathrm{\2}\3$", string)
 
     return string
 
@@ -285,8 +287,8 @@ def make_report():
         plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
                  fontsize=23, rotation=90, va='bottom', ha='left')
 
-        plt.xlabel(var_title[effplot['var']], fontsize=28)
-        plt.ylabel("Selection efficiency", fontsize=28)
+        plt.xlabel(var_title[effplot['var']], fontsize=20)
+        plt.ylabel("Selection efficiency", fontsize=20)
 
         report.add_figure()
         plt.close()
