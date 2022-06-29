@@ -124,6 +124,12 @@ def make_report():
     global GAN_COLOR
     GAN_COLOR = args.gan_color
 
+    if args.pdf:
+        if not os.path.exists('img'):
+            os.mkdir("img")
+        if not os.path.exists(f"img/{args.output_filename[:-5]}"):
+            os.mkdir(f"img/{args.output_filename[:-5]}")
+
     with open(args.histdb, 'rb') as file_in:
         histdb = json.load(file_in)
 
@@ -165,7 +171,7 @@ def make_report():
 
             draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label)
             plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
-            report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+            report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
             FIG_COUNTER += 1
             plt.close()
             report.write_report(filename=args.output_filename)
@@ -194,7 +200,7 @@ def make_report():
                                  transform=plt.gca().transAxes,
                                  fontfamily='serif',
                                  fontsize=18)
-                        report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+                        report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
                         FIG_COUNTER += 1
                         plt.close()
             else: # 2D scatter plots
@@ -226,7 +232,7 @@ def make_report():
                 plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
                          fontsize=23, rotation=90, va='bottom', ha='left')
 
-                report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+                report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
                 FIG_COUNTER += 1
                 plt.close()
 
@@ -298,7 +304,7 @@ def make_report():
         plt.ylabel("Selection efficiency", fontsize=25)
         plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.20)
 
-        report.add_figure(f'figure{FIG_COUNTER}' if args.pdf else None)
+        report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
         FIG_COUNTER += 1
         plt.close()
 
