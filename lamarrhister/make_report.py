@@ -66,7 +66,7 @@ def greeks(string, fmt):
 
     return string
 
-def draw_histogram (boundaries, contentsL, contentsR, title, gan_label):
+def draw_histogram (boundaries, contentsL, contentsR, title, gan_label, ref_label):
     if np.sum(contentsR) == 0 or np.sum(contentsL) == 0:
         return False
 
@@ -76,7 +76,7 @@ def draw_histogram (boundaries, contentsL, contentsR, title, gan_label):
     dx = (boundaries[1:] - boundaries[:-1]) / 2
     plt.hist(x, bins=boundaries, weights=contentsR, alpha=0.2, color='#08c')
     plt.hist(x, bins=boundaries, weights=contentsR,
-             alpha=1, color='#08c', histtype='step', linewidth=4, label='Reference'
+             alpha=1, color='#08c', histtype='step', linewidth=4, label=ref_label
              )
 
     plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.15)
@@ -111,6 +111,8 @@ def make_report():
                         help="Pickle file with merged reference (TurCal or Detailed Sim) histograms")
     parser.add_argument("--output-filename", '-o', type=str, default="report.html",
                         help="Output report file name (HTML format)")
+    parser.add_argument("--ref-label", type=str, default="Reference",
+                        help="Label of the reference histogram")
     parser.add_argument("--gan-label", type=str, default="GAN Simulation",
                         help="Label of the Lamarr histogram")
     parser.add_argument("--gan-color", type=str, default="#c08",
@@ -153,7 +155,7 @@ def make_report():
     n_events_lamarr = np.max([np.sum(hist[0]) for hist, desc in zip(lamarr['hists'], histdb['hists']) if len(desc['vars'])==1])
     n_events_reference = np.max([np.sum(hist[0]) for hist, desc in zip(reference['hists'], histdb['hists']) if len(desc['vars'])==1])
     report.add_markdown(f"Selected events in *{args.gan_label}* sample: {n_events_lamarr}")
-    report.add_markdown(f"Selected events in *Reference* sample: {n_events_reference}")
+    report.add_markdown(f"Selected events in *{args.ref_label}* sample: {n_events_reference}")
 
     report.add_markdown("### Histograms")
     for hist_desc, histR, histL in zip(histdb['hists'], reference['hists'], lamarr['hists']):
@@ -169,7 +171,7 @@ def make_report():
             contentsR = np.sum([np.asarray(contentsR)[i::args.rebin] for i in range(args.rebin)], axis=0)/args.rebin
             boundaries = np.asarray(boundaries)[::args.rebin]
 
-            draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label)
+            draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label, ref_label=args.ref_label)
             plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
             report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
             FIG_COUNTER += 1
@@ -181,8 +183,10 @@ def make_report():
             if len(boundariesY) < 20:
                 for iRow, (low, high) in enumerate(zip(boundariesY[:-1], boundariesY[1:])):
                     if draw_histogram(boundariesX, contentsL[:,iRow], contentsR[:,iRow],
-                                   title=greeks(histdb['title'], 'latex'),
-                                   gan_label=args.gan_label):
+                                      title=greeks(histdb['title'], 'latex'),
+                                      gan_label=args.gan_label,
+                                      ref_label=args.ref_label
+                                      ):
                         plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
                         bin_string = greeks(var_title[hist_desc['vars'][1]], 'latex')
                         if 'MeV' in bin_string:
@@ -211,7 +215,7 @@ def make_report():
                 report.add_markdown(f"Shape: {x.shape}")
                 contentsR *= 50 / np.max(contentsR)
                 contentsL *= 50 / np.max(contentsL)
-                plt.scatter(x.flatten(), y.flatten(), s=contentsR.T.flatten(), alpha=0.5, c='#08c', marker='s', label='Reference')
+                plt.scatter(x.flatten(), y.flatten(), s=contentsR.T.flatten(), alpha=0.5, c='#08c', marker='s', label=args.ref_label)
                 plt.scatter(x.flatten(), y.flatten(), s=contentsL.T.flatten(), alpha=0.3, c=GAN_COLOR, marker='s', label=args.gan_label)
 
                 plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
@@ -276,7 +280,7 @@ def make_report():
             ref_yerr = np.abs([ref_y - ref_eff[:, 0], ref_eff[:, 2] - ref_y])
             plt.errorbar(x[mskr], ref_y, ref_yerr, xerr[mskr],
                          fmt='o', color='#6be', markersize=0, linewidth=7, alpha=1,
-                         label='Reference'
+                         label=args.ref_label
                          )
             lam_y = lam_eff[:, 1]
             lam_yerr = [lam_y - lam_eff[:, 0], lam_eff[:, 2] - lam_y]
