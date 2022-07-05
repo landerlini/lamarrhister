@@ -32,6 +32,10 @@ def add_figure_to_report (report, path, options="width=49%"):
         """)
 
 
+def cnv_fontsize(fontsize: int, pdf: bool) -> int:
+    if pdf:
+        return fontsize
+    return int(fontsize*0.8)
 
 def efficiency(n, k):
     """
@@ -78,7 +82,7 @@ def greeks(string, fmt):
 
     return string
 
-def draw_histogram (boundaries, contentsL, contentsR, title, gan_label, ref_label):
+def draw_histogram (boundaries, contentsL, contentsR, title, gan_label, ref_label, pdf):
     if np.sum(contentsR) == 0 or np.sum(contentsL) == 0:
         return False
 
@@ -96,15 +100,16 @@ def draw_histogram (boundaries, contentsL, contentsR, title, gan_label, ref_labe
     plt.errorbar(x[msk], contentsL[msk], np.sqrt(contentsL[msk]), dx[msk],
                  fmt='o', color=GAN_COLOR, markersize=3,
                  label=gan_label)
-    plt.xticks(fontsize=30)
-    plt.yticks(fontsize=30)
+    plt.xticks(fontsize=cnv_fontsize(30, pdf))
+    plt.yticks(fontsize=cnv_fontsize(30, pdf))
     plt.legend(title=None, ncol=1, bbox_to_anchor=(0.785, 1.27),
-               fontsize=32, title_fontsize=31, loc='upper center', framealpha=1, shadow=True)
+               fontsize=cnv_fontsize(32, pdf), title_fontsize=cnv_fontsize(31, pdf),
+               loc='upper center', framealpha=1, shadow=True)
 
-    plt.text(0.5, 1.11, "LHCb Simulation Preliminary", transform=plt.gca().transAxes, fontfamily='serif', fontsize=34, ha='right', va='bottom')
-    plt.text(0.5, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif', fontsize=30, ha='right', va='bottom')
-    plt.text(1.02,  0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif', fontsize=28, rotation=90, va='bottom', ha='left')
-    plt.ylabel('Normalized candidates', fontsize=34)
+    plt.text(0.5, 1.11, "LHCb Simulation Preliminary", transform=plt.gca().transAxes, fontfamily='serif', fontsize=cnv_fontsize(34, pdf), ha='right', va='bottom')
+    plt.text(0.5, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif', fontsize=cnv_fontsize(30, pdf), ha='right', va='bottom')
+    plt.text(1.02,  0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif', fontsize=cnv_fontsize(28, pdf), rotation=90, va='bottom', ha='left')
+    plt.ylabel('Normalized candidates', fontsize=cnv_fontsize(34, pdf))
     return True
 
 
@@ -183,8 +188,8 @@ def make_report():
             contentsR = np.sum([np.asarray(contentsR)[i::args.rebin] for i in range(args.rebin)], axis=0)/args.rebin
             boundaries = np.asarray(boundaries)[::args.rebin]
 
-            draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label, ref_label=args.ref_label)
-            plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=32)
+            draw_histogram(boundaries, contentsL, contentsR, title=greeks(histdb['title'], 'latex'), gan_label=args.gan_label, ref_label=args.ref_label, pdf=args.pdf)
+            plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=cnv_fontsize(32, args.pdf))
 
             # report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None, thumb_fmt='svg')
             add_figure_to_report(report, f'img/{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
@@ -199,9 +204,10 @@ def make_report():
                     if draw_histogram(boundariesX, contentsL[:,iRow], contentsR[:,iRow],
                                       title=greeks(histdb['title'], 'latex'),
                                       gan_label=args.gan_label,
-                                      ref_label=args.ref_label
+                                      ref_label=args.ref_label,
+                                      pdf=args.pdf
                                       ):
-                        plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
+                        plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=cnv_fontsize(28, args.pdf))
                         bin_string = greeks(var_title[hist_desc['vars'][1]], 'latex')
                         if 'MeV' in bin_string:
                             bin_string = f"{bin_string} in [{low:.0f}, {high:.0f}]"
@@ -217,7 +223,7 @@ def make_report():
                                  ha='right', va='top',
                                  transform=plt.gca().transAxes,
                                  fontfamily='serif',
-                                 fontsize=18)
+                                 fontsize=cnv_fontsize(18, args.pdf))
                         #report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
                         add_figure_to_report(report, f'img/{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
                         FIG_COUNTER += 1
@@ -233,23 +239,25 @@ def make_report():
                 plt.scatter(x.flatten(), y.flatten(), s=contentsR.T.flatten(), alpha=0.5, c='#08c', marker='s', label=args.ref_label)
                 plt.scatter(x.flatten(), y.flatten(), s=contentsL.T.flatten(), alpha=0.3, c=GAN_COLOR, marker='s', label=args.gan_label)
 
-                plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=28)
-                plt.ylabel(greeks(var_title[hist_desc['vars'][1]], 'latex'), fontsize=28)
+                plt.xlabel(greeks(var_title[hist_desc['vars'][0]], 'latex'), fontsize=cnv_fontsize(28, args.pdf))
+                plt.ylabel(greeks(var_title[hist_desc['vars'][1]], 'latex'), fontsize=cnv_fontsize(28, args.pdf))
 
                 plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.15)
 
                 title = greeks(histdb['title'], 'latex')
-                plt.xticks(fontsize=30)
-                plt.yticks(fontsize=30)
+                plt.xticks(fontsize=cnv_fontsize(30, args.pdf))
+                plt.yticks(fontsize=cnv_fontsize(30, args.pdf))
                 plt.legend(title=None, ncol=1, bbox_to_anchor=(0.785, 1.27),
-                           fontsize=32, title_fontsize=31, loc='upper center', framealpha=1, shadow=True)
+                           fontsize=cnv_fontsize(32, args.pdf),
+                           title_fontsize=cnv_fontsize(31, args.pdf), loc='upper center', framealpha=1, shadow=True)
 
                 plt.text(0.5, 1.11, "LHCb Simulation Preliminary", transform=plt.gca().transAxes, fontfamily='serif',
-                         fontsize=34, ha='right', va='bottom')
-                plt.text(0.5, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif', fontsize=30, ha='right',
+                         fontsize=cnv_fontsize(34, args.pdf), ha='right', va='bottom')
+                plt.text(0.5, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif',
+                         fontsize=cnv_fontsize(30, args.pdf), ha='right',
                          va='bottom')
                 plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
-                         fontsize=28, rotation=90, va='bottom', ha='left')
+                         fontsize=cnv_fontsize(28, args.pdf), rotation=90, va='bottom', ha='left')
 
                 #report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
                 add_figure_to_report(report,
@@ -309,20 +317,23 @@ def make_report():
 
 
         title = greeks(histdb['title'], 'latex')
-        plt.xticks(fontsize=30)
-        plt.yticks(fontsize=30)
+        plt.xticks(fontsize=cnv_fontsize(30, args.pdf))
+        plt.yticks(fontsize=cnv_fontsize(30, args.pdf))
         plt.legend(title=None, ncol=1, bbox_to_anchor=(0.785, 1.27),
-                   fontsize=32, title_fontsize=31, loc='upper center', framealpha=1, shadow=True)
+                   fontsize=cnv_fontsize(32, args.pdf),
+                   title_fontsize=cnv_fontsize(31, args.pdf), loc='upper center', framealpha=1, shadow=True)
 
         plt.text(0.5, 1.11, "LHCb Simulation Preliminary", transform=plt.gca().transAxes, fontfamily='serif',
-                 fontsize=34, ha='right', va='bottom')
-        plt.text(0.5, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif', fontsize=30, ha='right',
+                 fontsize=cnv_fontsize(34, args.pdf), ha='right', va='bottom')
+        plt.text(0.5, 1.02, title, transform=plt.gca().transAxes, fontfamily='serif',
+                 fontsize=cnv_fontsize(30, args.pdf), ha='right',
                  va='bottom')
-        plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif', fontsize=28,
+        plt.text(1.02, 0.02, "Conditions: 2016 MagUp", transform=plt.gca().transAxes, fontfamily='serif',
+                 fontsize=cnv_fontsize(28, args.pdf),
                  rotation=90, va='bottom', ha='left')
 
-        plt.xlabel(greeks(var_title[effplot['var']], 'latex'), fontsize=34)
-        plt.ylabel("Selection efficiency", fontsize=34)
+        plt.xlabel(greeks(var_title[effplot['var']], 'latex'), fontsize=cnv_fontsize(34, args.pdf))
+        plt.ylabel("Selection efficiency", fontsize=cnv_fontsize(34, args.pdf))
         plt.subplots_adjust(top=0.8, bottom=0.15, right=0.95, left=0.20)
 
         #report.add_figure(f'{args.output_filename[:-5]}/figure{FIG_COUNTER}' if args.pdf else None)
